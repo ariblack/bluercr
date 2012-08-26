@@ -50,7 +50,8 @@
             android:id="@+id/listInstruction"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:cacheColorHint="#f0f0f0" >
+            android:cacheColorHint="#f0f0f0"
+            android:focusableInTouchMode="true"  >
         </ListView>
         
     </LinearLayout>

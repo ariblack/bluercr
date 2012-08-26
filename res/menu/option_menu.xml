@@ -19,7 +19,7 @@
           android:title="@string/connect"
           />
     <item android:id="@+id/run"
-          android:icon="@android:drawable/ic_menu_search"
+          android:icon="@android:drawable/ic_media_play"
           android:title="@string/run"
           />
     		

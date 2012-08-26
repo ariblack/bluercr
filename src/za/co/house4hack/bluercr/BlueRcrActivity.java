@@ -1,5 +1,6 @@
 package za.co.house4hack.bluercr;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -303,7 +304,6 @@ public class BlueRcrActivity extends Activity {
 		for(int i=0; i< mInstructionList.size(); i++){
 			final Instruction cur = mInstructionList.get(i);
 			final int item = i;
-			final boolean stop = item == mInstructionList.size()-1;
 			TimerTask t = new TimerTask() {
 				@Override
 				public void run() {
@@ -315,8 +315,8 @@ public class BlueRcrActivity extends Activity {
 						@Override
 						public void run() {
 							mInstructionListView.setSelection(item);
-							Toast.makeText(BlueRcrActivity.this, "Running:"+Integer.toString(item+1), (int) cur.duration*1000).show();
-							if(stop) setRunning(false);
+							DecimalFormat df = new DecimalFormat("#.#");
+							Toast.makeText(BlueRcrActivity.this, Integer.toString(item+1)+" - "+cur.lookupCommandText(cur.command)+" for "+df.format(cur.duration)+"s", (int) cur.duration*1000).show();							
 						}
 					});
 
@@ -326,6 +326,21 @@ public class BlueRcrActivity extends Activity {
 			mTimer.schedule(t, (long) (starttime*1000) );
 			starttime += cur.duration;
 		}
+		mTimer.schedule(new TimerTask() {
+			
+			@Override
+			public void run() {
+				runOnUiThread(new Runnable() {
+					
+					@Override
+					public void run() {
+						setRunning(false);
+						
+					}
+				});
+				
+			}
+		}, (long)starttime*1000);
 		
 
 	}
@@ -343,13 +358,15 @@ public class BlueRcrActivity extends Activity {
 		if(mMenuItemRun!=null){
 			if(mRunning){
 				mMenuItemRun.setTitle(getString(R.string.stop));
-				mInstructionListView.setFocusable(true);
+				mMenuItemRun.setIcon(android.R.drawable.ic_media_pause);
+				mInstructionListView.setEnabled(false);
 				
 				//updateData();
 				//updateData();
 				startTimer();
 			} else{
 				mMenuItemRun.setTitle(getString(R.string.run));				
+				mMenuItemRun.setIcon(android.R.drawable.ic_media_play);
 				stopTimer();
 				Toast.makeText(BlueRcrActivity.this, "Stopped", Toast.LENGTH_LONG).show();
 				mInstructionListView.setEnabled(true);
