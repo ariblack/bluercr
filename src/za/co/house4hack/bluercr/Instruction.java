@@ -8,6 +8,7 @@ public class Instruction {
 	
     public InstructionCommand command;
     public double duration;
+    public boolean active = false;
     
     public Instruction(InstructionCommand command, double duration){
     	this.command = command;

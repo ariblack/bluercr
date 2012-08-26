@@ -8,15 +8,16 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
@@ -66,6 +67,8 @@ public class InstructionAdapter extends BaseAdapter {
 					.findViewById(R.id.deleteinstruction);
 			item.insertButton = (ImageButton) convertView
 					.findViewById(R.id.insertinstruction);
+			item.background = (LinearLayout) convertView
+					.findViewById(R.id.background);
 
 			convertView.setTag(item);
 		} else {
@@ -81,6 +84,7 @@ public class InstructionAdapter extends BaseAdapter {
 
 	private class ViewItem implements OnClickListener, OnSeekBarChangeListener,
 			OnLongClickListener {
+		LinearLayout background;
 		ImageButton insertButton;
 		TextView idView;
 		ImageView commandImage;
@@ -111,6 +115,12 @@ public class InstructionAdapter extends BaseAdapter {
 				deleteButton.setOnClickListener(this);
 				insertButton.setOnClickListener(this);
 				updateDescription();
+				
+				if(instruction.active) {
+					background.setBackgroundColor(Color.BLUE);
+				} else {
+					background.setBackgroundColor(Color.BLACK);
+				}
 			}
 
 		}

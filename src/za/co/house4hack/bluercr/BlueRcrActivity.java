@@ -14,6 +14,7 @@ import android.bluetooth.BluetoothDevice;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -53,8 +54,8 @@ public class BlueRcrActivity extends Activity {
 	private ArrayList<Instruction> mInstructionList;
 	private InstructionAdapter mListAdapter;
 	private ListView mInstructionListView;
-	
-	private int mCurrentItem=0;
+
+	private int mCurrentItem = 0;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -66,12 +67,12 @@ public class BlueRcrActivity extends Activity {
 				R.layout.custom_title);
 
 		setContentView(R.layout.main);
-		
+
 		mInstructionList = new ArrayList<Instruction>();
-		mListAdapter = new InstructionAdapter(mInstructionList,this.getLayoutInflater());
+		mListAdapter = new InstructionAdapter(mInstructionList,
+				this.getLayoutInflater());
 		mInstructionListView = (ListView) findViewById(R.id.listInstruction);
 		mInstructionListView.setAdapter(mListAdapter);
-		
 
 		mTitle = (TextView) findViewById(R.id.title_left_text);
 		mTitle.setText(R.string.app_name);
@@ -121,7 +122,7 @@ public class BlueRcrActivity extends Activity {
 			}
 		}
 	}
-	
+
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
@@ -196,7 +197,6 @@ public class BlueRcrActivity extends Activity {
 		alert.show();
 	}
 
-
 	public void connectDevice(final BluetoothDevice device) {
 		if (mService != null) {
 			mService.connect(device);
@@ -248,7 +248,7 @@ public class BlueRcrActivity extends Activity {
 				break;
 
 			case MESSAGE_READ:
-				//addData();
+				// addData();
 				break;
 			case MESSAGE_DEVICE_NAME:
 				// save the connected device's name
@@ -292,61 +292,73 @@ public class BlueRcrActivity extends Activity {
 			}
 			return true;
 		case R.id.run:
-			
-				setRunning(!mRunning);
-			
+
+			setRunning(!mRunning);
+
 		}
 		return false;
 	}
+
 	public void startTimer() {
 		mTimer = new Timer();
 		double starttime = 0;
-		for(int i=0; i< mInstructionList.size(); i++){
+		for (int i = 0; i < mInstructionList.size(); i++) {
 			final Instruction cur = mInstructionList.get(i);
 			final int item = i;
+
 			TimerTask t = new TimerTask() {
 				@Override
 				public void run() {
 					if (mService.getState() == BluetoothService.STATE_CONNECTED) {
 						mService.write(cur.lookupBT(cur.command).getBytes());
 					}
-					
+
 					runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
+							cur.active = true;
+							mListAdapter.notifyDataSetChanged();
 							mInstructionListView.setSelection(item);
+
 							DecimalFormat df = new DecimalFormat("#.#");
-							Toast.makeText(BlueRcrActivity.this, Integer.toString(item+1)+" - "+cur.lookupCommandText(cur.command)+" for "+df.format(cur.duration)+"s", (int) cur.duration*1000).show();							
+							Toast.makeText(
+									BlueRcrActivity.this,
+									Integer.toString(item + 1)
+											+ " - "
+											+ cur.lookupCommandText(cur.command)
+											+ " for " + df.format(cur.duration)
+											+ "s", (int) cur.duration * 1000)
+									.show();
 						}
 					});
 
 				}
 
 			};
-			mTimer.schedule(t, (long) (starttime*1000) );
+			mTimer.schedule(t, (long) (starttime * 1000));
 			starttime += cur.duration;
 		}
 		mTimer.schedule(new TimerTask() {
-			
+
 			@Override
 			public void run() {
 				runOnUiThread(new Runnable() {
-					
+
 					@Override
 					public void run() {
 						setRunning(false);
-						
+
 					}
 				});
-				
+
 			}
-		}, (long)starttime*1000);
-		
+		}, (long) starttime * 1000);
 
 	}
-	
-	public void stopTimer(){
-		if(mTimer !=null) mTimer.cancel();
+
+	public void stopTimer() {
+		if (mTimer != null)
+			mTimer.cancel();
 	}
 
 	public boolean ismRunning() {
@@ -355,43 +367,54 @@ public class BlueRcrActivity extends Activity {
 
 	public void setRunning(boolean mRunning) {
 		this.mRunning = mRunning;
-		if(mMenuItemRun!=null){
-			if(mRunning){
+		if (mMenuItemRun != null) {
+			if (mRunning) {
 				mMenuItemRun.setTitle(getString(R.string.stop));
 				mMenuItemRun.setIcon(android.R.drawable.ic_media_pause);
-				mInstructionListView.setEnabled(false);
-				
-				//updateData();
-				//updateData();
+
+				// updateData();
+				// updateData();
 				startTimer();
-			} else{
-				mMenuItemRun.setTitle(getString(R.string.run));				
+			} else {
+				for (int i = 0; i < mInstructionList.size(); i++) {
+					mInstructionList.get(i).active = false;
+				}
+				mListAdapter.notifyDataSetChanged();
+
+				mMenuItemRun.setTitle(getString(R.string.run));
 				mMenuItemRun.setIcon(android.R.drawable.ic_media_play);
 				stopTimer();
-				Toast.makeText(BlueRcrActivity.this, "Stopped", Toast.LENGTH_LONG).show();
-				mInstructionListView.setEnabled(true);
+				Toast.makeText(BlueRcrActivity.this, "Stopped",
+						Toast.LENGTH_LONG).show();
 			}
 		}
 	}
-	
-	public void leftClick(View v){
-		mInstructionList.add(new Instruction(InstructionCommand.LEFT,DEFAULT_DURATION));
-		mListAdapter.notifyDataSetChanged();
-		
-	}
-	public void rightClick(View v){
-		mInstructionList.add(new Instruction(InstructionCommand.RIGHT,DEFAULT_DURATION));
-		mListAdapter.notifyDataSetChanged();
-		
-	}
-	public void forwardClick(View v){
-		mInstructionList.add(new Instruction(InstructionCommand.FORWARD,DEFAULT_DURATION));
+
+	public void leftClick(View v) {
+		mInstructionList.add(new Instruction(InstructionCommand.LEFT,
+				DEFAULT_DURATION));
 		mListAdapter.notifyDataSetChanged();
 
 	}
-	public void stopClick(View v){
-		mInstructionList.add(new Instruction(InstructionCommand.STOP,DEFAULT_DURATION));
+
+	public void rightClick(View v) {
+		mInstructionList.add(new Instruction(InstructionCommand.RIGHT,
+				DEFAULT_DURATION));
 		mListAdapter.notifyDataSetChanged();
-		
+
+	}
+
+	public void forwardClick(View v) {
+		mInstructionList.add(new Instruction(InstructionCommand.FORWARD,
+				DEFAULT_DURATION));
+		mListAdapter.notifyDataSetChanged();
+
+	}
+
+	public void stopClick(View v) {
+		mInstructionList.add(new Instruction(InstructionCommand.STOP,
+				DEFAULT_DURATION));
+		mListAdapter.notifyDataSetChanged();
+
 	}
 }
