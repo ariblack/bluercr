@@ -24,6 +24,7 @@ import android.widget.TextView;
 
 public class InstructionAdapter extends BaseAdapter {
 
+	public static final double MAXDURATION = 2.0;
 	private List<Instruction> mInstructionList;
 	private LayoutInflater mInflater;
 
@@ -109,7 +110,7 @@ public class InstructionAdapter extends BaseAdapter {
 				commandImage.setOnLongClickListener(this);
 
 				durationBar.setOnSeekBarChangeListener(this);
-				durationBar.setProgress((int) (instruction.duration * 10));
+				durationBar.setProgress((int) (instruction.duration/ MAXDURATION*100.0));
 				durationBar.setMax(100);
 
 				deleteButton.setOnClickListener(this);
@@ -173,7 +174,7 @@ public class InstructionAdapter extends BaseAdapter {
 		@Override
 		public void onProgressChanged(SeekBar seekBar, int progress,
 				boolean fromUser) {
-			instruction.duration = progress / 10.0;
+			instruction.duration = ((float)progress) / 100f * MAXDURATION;
 			updateDescription();
 
 		}
@@ -225,6 +226,17 @@ public class InstructionAdapter extends BaseAdapter {
 				@Override
 				public void onClick(View v) {
 					instruction.command = InstructionCommand.FORWARD;
+					parent.notifyDataSetChanged();
+					dialog.dismiss();
+				}
+			});
+
+			ImageButton butReverse = (ImageButton) dialog
+					.findViewById(R.id.butReverse);
+			butReverse.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					instruction.command = InstructionCommand.REVERSE;
 					parent.notifyDataSetChanged();
 					dialog.dismiss();
 				}

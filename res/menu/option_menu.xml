@@ -22,6 +22,9 @@
           android:icon="@android:drawable/ic_media_play"
           android:title="@string/run"
           />
-    		
+    <item android:id="@+id/clear"
+          android:icon="@android:drawable/ic_menu_delete"
+          android:title="@string/clear"
+          />    		
     
 </menu>

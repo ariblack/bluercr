@@ -51,7 +51,6 @@ public class BluetoothService {
 	private ConnectThread mConnectThread;
 	private ConnectedThread mConnectedThread;
 	private int mState;
-	private List<String> mReceived;
 
 	// Constants that indicate the current connection state
 	public static final int STATE_NONE = 0; // we're doing nothing
@@ -70,12 +69,10 @@ public class BluetoothService {
 	 * @param handler
 	 *            A Handler to send messages back to the UI Activity
 	 */
-	public BluetoothService(Context context, Handler handler,
-			List<String> received) {
+	public BluetoothService(Context context, Handler handler) {
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
 		mState = STATE_NONE;
 		mHandler = handler;
-		mReceived = received;
 	}
 
 	/**
@@ -377,23 +374,6 @@ public class BluetoothService {
 					String[] parts = readMessage.split("\\\\n");
 					recbuf += parts[0];
 
-					synchronized (mReceived) {
-
-						if (parts.length > 1) {
-							mReceived.add(recbuf);
-							recbuf = "";
-
-							for (int i = 1; i < parts.length - 1; i++) {
-								mReceived.add(parts[i]);
-							}
-							recbuf = parts[parts.length - 1];
-						} else {
-							if (recbuf.endsWith("\n")) {
-								mReceived.add(recbuf);
-								recbuf = "";
-							}
-						}
-					}
 					mHandler.obtainMessage(BlueRcrActivity.MESSAGE_READ)
 							.sendToTarget();
 

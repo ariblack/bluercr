@@ -26,6 +26,12 @@
             android:src="@drawable/forward" />
 
         <ImageButton
+            android:id="@+id/butReverse"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="reverseClick"
+            android:src="@drawable/back" />
+        <ImageButton
             android:id="@+id/butRight"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

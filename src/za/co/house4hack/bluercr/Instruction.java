@@ -3,8 +3,11 @@ package za.co.house4hack.bluercr;
 public class Instruction {
 
 	public enum InstructionCommand {
-	     LEFT, RIGHT, FORWARD, STOP
+	     LEFT, RIGHT, FORWARD, STOP, REVERSE
 	}
+
+	public static final String STOPCOMMAND = "vzsha";
+	public static final double DEFAULT_DURATION = 0.5;
 	
     public InstructionCommand command;
     public double duration;
@@ -13,6 +16,11 @@ public class Instruction {
     public Instruction(InstructionCommand command, double duration){
     	this.command = command;
     	this.duration = duration;
+    }
+
+    public Instruction(InstructionCommand command){
+    	this.command = command;
+    	this.duration = DEFAULT_DURATION;
     }
     
     @Override
@@ -32,6 +40,9 @@ public class Instruction {
 			return "Right";
 		case STOP:
 			return "Stop";
+		case REVERSE:
+			return "Reverse";
+			
 		}
 		return "Unknown";
 	}
@@ -46,6 +57,8 @@ public class Instruction {
 			return R.drawable.right;
 		case STOP:
 			return R.drawable.stop;
+		case REVERSE:	
+			return R.drawable.back;
 		}
 		return 0;
 	}
@@ -53,13 +66,15 @@ public class Instruction {
 	String lookupBT(InstructionCommand command) {
 		switch (command) {
 		case FORWARD:
-			return "f";
+			return "vfg";
 		case LEFT:
-			return "lf";
+			return "lfleg";
 		case RIGHT:
-			return "rf";
+			return "rfreg";
+		case REVERSE:
+			return "vdg";			
 		case STOP:
-			return "s";
+			return STOPCOMMAND;
 		}
 		return "Unknown";
 	}

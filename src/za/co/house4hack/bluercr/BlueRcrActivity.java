@@ -44,12 +44,11 @@ public class BlueRcrActivity extends Activity {
 	// Key names received from the BluetoothChatService Handler
 	public static final String DEVICE_NAME = "device_name";
 	public static final String TOAST = "toast";
-	private static final float DEFAULT_DURATION = 3;
+	
 
 	// Name of the connected device
 	private String mConnectedDeviceName = null;
 	private TextView mTitle;
-	private List<String> mReceived;
 	private boolean mRunning;
 	private ArrayList<Instruction> mInstructionList;
 	private InstructionAdapter mListAdapter;
@@ -132,7 +131,7 @@ public class BlueRcrActivity extends Activity {
 		Log.d(TAG, "setupChat()");
 
 		// Initialize the BluetoothChatService to perform bluetooth connections
-		mService = new BluetoothService(this, mHandlerBT, mReceived);
+		mService = new BluetoothService(this, mHandlerBT);
 
 	}
 
@@ -222,7 +221,7 @@ public class BlueRcrActivity extends Activity {
 
 					mTitle.setText(R.string.title_connected_to);
 					mTitle.append(mConnectedDeviceName);
-					setRunning(true);
+					//setRunning(true);
 					break;
 
 				case BluetoothService.STATE_CONNECTING:
@@ -238,7 +237,7 @@ public class BlueRcrActivity extends Activity {
 					}
 
 					mTitle.setText(R.string.title_not_connected);
-					setRunning(false);
+					//setRunning(false);
 
 					break;
 				}
@@ -294,7 +293,11 @@ public class BlueRcrActivity extends Activity {
 		case R.id.run:
 
 			setRunning(!mRunning);
-
+            return true;
+		case R.id.clear:
+			mInstructionList.clear();
+			mListAdapter.notifyDataSetChanged();
+			return true;
 		}
 		return false;
 	}
@@ -346,6 +349,10 @@ public class BlueRcrActivity extends Activity {
 
 					@Override
 					public void run() {
+						if (mService.getState() == BluetoothService.STATE_CONNECTED) {
+							mService.write(Instruction.STOPCOMMAND.getBytes());
+						}
+
 						setRunning(false);
 
 					}
@@ -391,29 +398,31 @@ public class BlueRcrActivity extends Activity {
 	}
 
 	public void leftClick(View v) {
-		mInstructionList.add(new Instruction(InstructionCommand.LEFT,
-				DEFAULT_DURATION));
+		mInstructionList.add(new Instruction(InstructionCommand.LEFT));
 		mListAdapter.notifyDataSetChanged();
 
 	}
 
 	public void rightClick(View v) {
-		mInstructionList.add(new Instruction(InstructionCommand.RIGHT,
-				DEFAULT_DURATION));
+		mInstructionList.add(new Instruction(InstructionCommand.RIGHT));
 		mListAdapter.notifyDataSetChanged();
 
 	}
 
 	public void forwardClick(View v) {
-		mInstructionList.add(new Instruction(InstructionCommand.FORWARD,
-				DEFAULT_DURATION));
+		mInstructionList.add(new Instruction(InstructionCommand.FORWARD));
 		mListAdapter.notifyDataSetChanged();
 
 	}
 
+	public void reverseClick(View v) {
+		mInstructionList.add(new Instruction(InstructionCommand.REVERSE));
+		mListAdapter.notifyDataSetChanged();
+
+	}
+	
 	public void stopClick(View v) {
-		mInstructionList.add(new Instruction(InstructionCommand.STOP,
-				DEFAULT_DURATION));
+		mInstructionList.add(new Instruction(InstructionCommand.STOP));
 		mListAdapter.notifyDataSetChanged();
 
 	}
